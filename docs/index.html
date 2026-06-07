@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Online Timer - Universitas SAQ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f4f7fb;
+        color: #0f172a;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Font formal, tebal, dan tabular (jarak angka konsisten) */
+      .font-timer {
+        font-family: "Inter", sans-serif;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.04em;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      .preset-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1.5px solid #f1f5f9;
+        background-color: #ffffff;
+        color: #94a3b8;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .preset-pill:hover {
+        border-color: #cbd5e1;
+        color: #64748b;
+      }
+      .preset-pill.active {
+        border-color: #e0e7ff;
+        background-color: #f5f8ff;
+        color: #8b5cf6;
+      }
+
+      @keyframes gentle-pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+      .animate-gentle-pulse {
+        animation: gentle-pulse 2.5s ease-in-out infinite;
+      }
+
+      /* CSS UNTUK ANIMASI ROLL PER CHARACTER */
+      .digit-container {
+        display: inline-flex;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        height: 1em; /* Mengunci tinggi agar angka tidak keluar jalur */
+        line-height: 1;
+        vertical-align: bottom;
+      }
+
+      .digit {
+        display: inline-block;
+      }
+
+      /* Animasi Roll In (jatuh dengan sedikit pantulan) */
+      .roll-animation {
+        animation: rollDown 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15)
+          forwards;
+      }
+
+      @keyframes rollDown {
+        0% {
+          transform: translateY(-70%);
+          opacity: 0.3;
+        }
+        100% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-4 md:p-10 flex items-center justify-center">
+    <div
+      class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch"
+    >
+      <div
+        class="bg-white p-8 md:p-10 rounded-[2rem] shadow-[0_4px_40px_rgb(0,0,0,0.03)] border border-slate-50 flex flex-col"
+      >
+        <div class="flex items-center gap-4 mb-8">
+          <div
+            class="p-2.5 bg-slate-50/80 rounded-2xl border border-slate-100/80 text-slate-600"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+          </div>
+          <h2 class="text-[1.35rem] font-bold text-slate-800 tracking-tight">
+            Setelan Timer
+          </h2>
+        </div>
+
+        <div class="mb-8">
+          <label
+            class="block text-[0.8rem] font-bold text-slate-400 mb-2"
+            for="input-timer-name"
+            >Nama Kegiatan / Tugas</label
+          >
+          <input
+            type="text"
+            id="input-timer-name"
+            class="w-full bg-white border border-slate-100 p-4 rounded-[1rem] text-sm font-semibold text-slate-700 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 outline-none transition-all placeholder:text-slate-300 placeholder:font-medium shadow-sm"
+            placeholder="MBTI"
+          />
+        </div>
+
+        <div class="mb-8">
+          <div class="flex items-center justify-between mb-3">
+            <label
+              class="text-[0.8rem] font-bold text-slate-800"
+              for="input-min"
+              >Atur Waktu</label
+            >
+            <span
+              class="text-[0.7rem] font-bold text-slate-300 bg-slate-50 px-2 py-1 rounded-md"
+              >Format: MM:SS</span
+            >
+          </div>
+          <div class="flex items-center gap-3">
+            <div
+              class="flex-1 bg-white border border-slate-100 shadow-sm rounded-[1rem] relative pt-6 pb-2 transition-all focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-50"
+            >
+              <span
+                class="absolute top-3 left-0 right-0 text-[0.6rem] tracking-[0.15em] font-extrabold text-slate-300 text-center pointer-events-none"
+                >MENIT</span
+              >
+              <input
+                type="number"
+                id="input-min"
+                class="w-full bg-transparent text-4xl font-timer text-center text-slate-700 outline-none placeholder:text-slate-200"
+                placeholder="45"
+                min="0"
+                max="99"
+              />
+            </div>
+            <div class="text-3xl text-slate-200 font-bold mb-2">:</div>
+            <div
+              class="flex-1 bg-white border border-slate-100 shadow-sm rounded-[1rem] relative pt-6 pb-2 transition-all focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-50"
+            >
+              <span
+                class="absolute top-3 left-0 right-0 text-[0.6rem] tracking-[0.15em] font-extrabold text-slate-300 text-center pointer-events-none"
+                >DETIK</span
+              >
+              <input
+                type="number"
+                id="input-sec"
+                class="w-full bg-transparent text-4xl font-timer text-center text-slate-700 outline-none placeholder:text-slate-200"
+                placeholder="0"
+                min="0"
+                max="59"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label class="block text-[0.8rem] font-bold text-slate-800 mb-3"
+            >Preset Waktu Cepat</label
+          >
+          <div class="flex flex-wrap gap-2.5">
+            <div class="preset-pill group" data-minutes="5" data-seconds="0">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2"></span
+              >5 Menit
+            </div>
+            <div class="preset-pill group" data-minutes="10" data-seconds="0">
+              <span class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-2"></span>10
+              Menit
+            </div>
+            <div
+              class="preset-pill group active"
+              data-minutes="45"
+              data-seconds="0"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-purple-400 mr-2"></span
+              >45 Menit
+            </div>
+            <div class="preset-pill group" data-minutes="60" data-seconds="0">
+              <span class="w-1.5 h-1.5 rounded-full bg-pink-300 mr-2"></span>1
+              Jam
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="bg-white p-8 md:p-10 rounded-[2rem] shadow-[0_4px_40px_rgb(0,0,0,0.03)] border border-slate-50 flex flex-col h-full"
+      >
+        <div class="flex items-center justify-between mb-8">
+          <h2
+            class="text-[1.35rem] font-bold text-slate-800 tracking-tight flex items-center gap-4"
+          >
+            <div
+              class="p-2.5 bg-indigo-50 rounded-2xl border border-indigo-100/50"
+            >
+              <svg
+                class="w-5 h-5 text-indigo-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                ></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                ></path>
+              </svg>
+            </div>
+            Layar Timer
+          </h2>
+          <span
+            class="text-[0.7rem] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5"
+          >
+            Estimasi
+            <span id="total-time-readout" class="text-indigo-600 font-timer"
+              >45:00</span
+            >
+          </span>
+        </div>
+
+        <div class="flex-grow flex flex-col justify-center mb-8 relative">
+          <div
+            id="dropzone-standby"
+            class="border-[1.5px] border-dashed border-slate-200 bg-slate-50/50 rounded-[1.8rem] py-8 px-6 text-center transition-all h-full flex flex-col items-center justify-center"
+          >
+            <div
+              class="bg-white p-4 rounded-full shadow-sm mb-4 border border-slate-100"
+            >
+              <svg
+                class="w-8 h-8 text-indigo-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+            </div>
+            <p class="text-sm font-bold text-slate-700 mb-1">Siap Dimulai</p>
+            <p class="text-xs font-medium text-slate-400">
+              Atur waktu di panel kiri, lalu tekan tombol di bawah.
+            </p>
+          </div>
+
+          <div id="timer-display-area" class="hidden h-full">
+            <div
+              class="bg-gradient-to-br from-[#eff6ff] to-[#eef2ff] border border-blue-100 rounded-[1.8rem] flex flex-col items-center justify-center transition-all py-10 px-6 shadow-inner w-full h-full relative overflow-hidden"
+            >
+              <h3
+                id="display-timer-name"
+                class="text-sm md:text-base font-bold text-indigo-600 mb-4 text-center w-full truncate relative z-10 tracking-widest uppercase"
+              >
+                MBTI
+              </h3>
+
+              <div
+                id="time-display"
+                class="font-timer text-7xl md:text-[6.5rem] tracking-tighter text-[#1e293b] relative z-10 leading-none mb-4 flex items-center justify-center"
+              >
+                <div class="digit-container">
+                  <span id="disp-min-tens" class="digit" data-val="4">4</span>
+                </div>
+                <div class="digit-container">
+                  <span id="disp-min-ones" class="digit" data-val="5">5</span>
+                </div>
+
+                <span
+                  class="mx-1 md:mx-2 pb-2 md:pb-4 inline-block align-top font-bold text-slate-800"
+                  >:</span
+                >
+
+                <div class="digit-container">
+                  <span id="disp-sec-tens" class="digit" data-val="0">0</span>
+                </div>
+                <div class="digit-container">
+                  <span id="disp-sec-ones" class="digit" data-val="0">0</span>
+                </div>
+              </div>
+
+              <p
+                class="text-[0.65rem] font-bold text-slate-400 animate-gentle-pulse mt-1 relative z-10 tracking-[0.2em] uppercase"
+              >
+                Waktu Tersisa
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-auto pt-2">
+          <button
+            id="btn-start"
+            class="w-full p-4 md:p-[1.15rem] bg-[#1e293b] hover:bg-[#0f172a] text-white text-[0.95rem] font-bold rounded-2xl transition-all shadow-xl shadow-slate-200 active:scale-[0.98] flex items-center justify-center gap-2"
+          >
+            Mulai Timer
+          </button>
+
+          <div id="running-controls" class="hidden flex items-center gap-4">
+            <button
+              id="btn-pause"
+              class="flex-1 p-4 md:p-[1.15rem] bg-[#1e293b] hover:bg-[#0f172a] text-white text-[0.95rem] font-bold rounded-2xl transition-all shadow-lg shadow-slate-200/50 active:scale-[0.98]"
+            >
+              Pause
+            </button>
+            <button
+              id="btn-reset"
+              class="flex-1 p-4 md:p-[1.15rem] bg-white hover:bg-red-50 border border-red-200 text-[#dc2626] text-[0.95rem] font-bold rounded-2xl transition-all shadow-sm active:scale-[0.98]"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const inputTimerName = document.getElementById("input-timer-name");
+      const displayTimerName = document.getElementById("display-timer-name");
+      const inputMin = document.getElementById("input-min");
+      const inputSec = document.getElementById("input-sec");
+      const totalTimeReadout = document.getElementById("total-time-readout");
+
+      const dropzoneStandby = document.getElementById("dropzone-standby");
+      const timerDisplayArea = document.getElementById("timer-display-area");
+
+      // Target individual digit spans
+      const dispMinTens = document.getElementById("disp-min-tens");
+      const dispMinOnes = document.getElementById("disp-min-ones");
+      const dispSecTens = document.getElementById("disp-sec-tens");
+      const dispSecOnes = document.getElementById("disp-sec-ones");
+
+      const btnStart = document.getElementById("btn-start");
+      const runningControls = document.getElementById("running-controls");
+      const btnPause = document.getElementById("btn-pause");
+      const btnReset = document.getElementById("btn-reset");
+      const presets = document.querySelectorAll(".preset-pill");
+
+      let timerInterval = null;
+      let totalSeconds = 0;
+      let isPaused = false;
+      let currentTimerName = "MBTI";
+
+      inputMin.value = "45";
+      inputSec.value = "0";
+
+      const alarmSound = new Audio(
+        "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3",
+      );
+      const formatTime = (time) => time.toString().padStart(2, "0");
+
+      const formatTotalReadout = (seconds) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${formatTime(m)}:${formatTime(s)}`;
+      };
+
+      // FUNGSI KHUSUS UNTUK TRIGGER ANIMASI PER KARAKTER
+      const updateDigit = (element, newValue) => {
+        // Cek jika angka berubah dari sebelumnya
+        if (element.dataset.val !== newValue) {
+          element.classList.remove("roll-animation");
+
+          // Force browser reflow untuk memuat ulang CSS animation
+          void element.offsetWidth;
+
+          element.textContent = newValue;
+          element.dataset.val = newValue;
+          element.classList.add("roll-animation");
+        }
+      };
+
+      // FUNGSI UPDATE DISPLAY UTAMA
+      const updateDisplay = () => {
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+
+        const currentMinStr = formatTime(m); // "45"
+        const currentSecStr = formatTime(s); // "59"
+
+        const titlePrefix = currentTimerName ? `${currentTimerName} - ` : "";
+        document.title = `(${currentMinStr}:${currentSecStr}) ${titlePrefix}Timer`;
+
+        // Update animasi per digit index
+        updateDigit(dispMinTens, currentMinStr[0]);
+        updateDigit(dispMinOnes, currentMinStr[1]);
+        updateDigit(dispSecTens, currentSecStr[0]);
+        updateDigit(dispSecOnes, currentSecStr[1]);
+      };
+
+      const toggleUI = (isPlaying) => {
+        if (isPlaying) {
+          dropzoneStandby.classList.add("hidden");
+          timerDisplayArea.classList.remove("hidden");
+
+          inputTimerName.disabled = true;
+          inputTimerName.classList.add("opacity-60", "bg-slate-50");
+          inputMin.disabled = true;
+          inputSec.disabled = true;
+          inputMin.parentElement.classList.add("opacity-60", "bg-slate-50");
+          inputSec.parentElement.classList.add("opacity-60", "bg-slate-50");
+          presets.forEach((p) =>
+            p.classList.add("opacity-50", "pointer-events-none"),
+          );
+
+          btnStart.classList.add("hidden");
+          runningControls.classList.remove("hidden");
+          runningControls.classList.add("flex");
+        } else {
+          dropzoneStandby.classList.remove("hidden");
+          timerDisplayArea.classList.add("hidden");
+
+          inputTimerName.disabled = false;
+          inputTimerName.classList.remove("opacity-60", "bg-slate-50");
+          inputMin.disabled = false;
+          inputSec.disabled = false;
+          inputMin.parentElement.classList.remove("opacity-60", "bg-slate-50");
+          inputSec.parentElement.classList.remove("opacity-60", "bg-slate-50");
+          presets.forEach((p) =>
+            p.classList.remove("opacity-50", "pointer-events-none"),
+          );
+
+          btnStart.classList.remove("hidden");
+          runningControls.classList.add("hidden");
+          runningControls.classList.remove("flex");
+
+          // Reset styling ke default
+          dispMinTens.parentElement.parentElement.classList.remove(
+            "text-red-500",
+          );
+          btnPause.textContent = "Pause";
+          document.title = "Online Timer - Universitas SAQ";
+        }
+      };
+
+      const startTimer = () => {
+        if (!isPaused) {
+          let m = parseInt(inputMin.value) || 0;
+          let s = parseInt(inputSec.value) || 0;
+          totalSeconds = m * 60 + s;
+
+          if (totalSeconds <= 0) return alert("Masukkan waktu yang valid!");
+
+          currentTimerName = inputTimerName.value.trim() || "TUGAS";
+          displayTimerName.textContent = currentTimerName;
+        }
+
+        isPaused = false;
+        toggleUI(true);
+        updateDisplay();
+        btnPause.textContent = "Pause";
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          totalSeconds--;
+          updateDisplay();
+
+          if (totalSeconds <= 0) {
+            clearInterval(timerInterval);
+            alarmSound.play();
+
+            // Memaksa display jadi "0" dengan warna peringatan
+            updateDigit(dispMinTens, "0");
+            updateDigit(dispMinOnes, "0");
+            updateDigit(dispSecTens, "0");
+            updateDigit(dispSecOnes, "0");
+
+            dispMinTens.parentElement.parentElement.classList.add(
+              "text-red-500",
+            );
+
+            document.title = "Waktu Habis!";
+            setTimeout(() => {
+              alert(`Waktu Habis untuk: ${currentTimerName}!`);
+              resetTimer();
+            }, 500);
+          }
+        }, 1000);
+      };
+
+      const pauseTimer = () => {
+        if (isPaused) {
+          startTimer();
+        } else {
+          clearInterval(timerInterval);
+          isPaused = true;
+          btnPause.textContent = "Lanjut";
+        }
+      };
+
+      const resetTimer = () => {
+        clearInterval(timerInterval);
+        isPaused = false;
+        totalSeconds = 0;
+        toggleUI(false);
+      };
+
+      const handlePresetClick = (event) => {
+        const pill = event.currentTarget;
+        const min = pill.getAttribute("data-minutes");
+        const sec = pill.getAttribute("data-seconds");
+
+        presets.forEach((p) => p.classList.remove("active"));
+        pill.classList.add("active");
+
+        inputMin.value = min;
+        inputSec.value = sec;
+
+        totalTimeReadout.textContent = formatTotalReadout(
+          parseInt(min) * 60 + parseInt(sec),
+        );
+      };
+
+      [inputMin, inputSec].forEach((input) => {
+        input.addEventListener("input", () => {
+          const m = parseInt(inputMin.value) || 0;
+          const s = parseInt(inputSec.value) || 0;
+          totalTimeReadout.textContent = formatTotalReadout(m * 60 + s);
+          presets.forEach((p) => p.classList.remove("active"));
+        });
+      });
+
+      btnStart.addEventListener("click", startTimer);
+      btnPause.addEventListener("click", pauseTimer);
+      btnReset.addEventListener("click", resetTimer);
+      presets.forEach((p) => p.addEventListener("click", handlePresetClick));
+    </script>
+  </body>
+</html>

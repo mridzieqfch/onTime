@@ -1,4 +1,4 @@
-# Online Timer - Universitas SAQ
+# Online Timer - Laboratorium SAQ
 
 Aplikasi timer online yang dirancang khusus untuk kebutuhan Universitas SAQ, dengan antarmuka modern dan responsif.
 

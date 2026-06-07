@@ -279,6 +279,81 @@
 
           <div class="flex items-center gap-3">
             <button
+              id="btn-expand"
+              class="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                ></path>
+              </svg>
+            </button>
+            <span
+              class="text-[0.7rem] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5"
+            >
+              Estimasi
+              <span id="total-time-readout" class="text-indigo-600 font-timer"
+                >45:00</span
+              >
+            </span>
+          </div>
+
+          <div
+            id="fullscreen-timer-modal"
+            class="fixed inset-0 z-[60] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300"
+          >
+            <div class="absolute inset-0 bg-white/95 backdrop-blur-xl"></div>
+
+            <button
+              id="btn-close-expand"
+              class="absolute top-8 right-8 p-3 hover:bg-slate-100 rounded-full transition-all text-slate-400 hover:text-slate-900"
+            >
+              <svg
+                class="w-8 h-8"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+
+            <div class="relative z-10 flex flex-col items-center w-full px-4">
+              <h3
+                id="fullscreen-timer-name"
+                class="text-2xl font-bold text-indigo-600 mb-8 tracking-widest uppercase"
+              >
+                Timer
+              </h3>
+              <div
+                class="font-timer text-[20rem] leading-none tracking-tighter text-slate-900"
+              >
+                <span id="fs-min">45</span>:<span id="fs-sec">00</span>
+              </div>
+              <p
+                class="text-2xl font-bold text-slate-400 mt-4 uppercase tracking-[0.5em]"
+              >
+                Waktu Tersisa
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button
               id="btn-sound-enable"
               class="px-4 py-2 bg-emerald-50 border border-emerald-300 text-emerald-700 text-[0.75rem] font-bold rounded-lg transition-all active:scale-95 flex items-center gap-1.5 hover:bg-emerald-100"
             >
@@ -363,6 +438,27 @@
             <div
               class="bg-gradient-to-br from-[#48A111] to-[#48A111] border border-blue-100 rounded-[1.8rem] flex flex-col items-center justify-center transition-all py-10 px-6 shadow-inner w-full h-full relative overflow-hidden"
             >
+              <button
+                id="btn-expand-display"
+                class="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-lg text-white transition-all z-20"
+                title="Perbesar tampilan"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                  ></path>
+                </svg>
+              </button>
+
               <h3
                 id="display-timer-name"
                 class="text-sm md:text-base font-bold text-indigo-600 mb-4 text-center w-full truncate relative z-10 tracking-widest uppercase"
@@ -477,6 +573,68 @@
       </div>
     </div>
 
+    <div
+      id="expanded-display-modal"
+      class="fixed inset-0 z-[55] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <div
+        class="absolute inset-0 bg-gradient-to-br from-[#48A111] to-[#48A111] backdrop-blur-sm"
+      ></div>
+
+      <button
+        id="btn-close-expanded"
+        class="absolute top-6 right-6 p-3 bg-white/20 hover:bg-white/30 rounded-full text-white transition-all z-10"
+      >
+        <svg
+          class="w-8 h-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
+
+      <div class="relative z-10 flex flex-col items-center w-full px-4">
+        <h3
+          id="expanded-timer-name"
+          class="text-3xl font-bold text-indigo-600 mb-8 tracking-widest uppercase"
+        >
+          Timer
+        </h3>
+        <div
+          class="font-timer text-[25rem] leading-none tracking-tighter text-slate-900 flex items-center justify-center"
+        >
+          <div class="digit-container">
+            <span id="exp-disp-min-tens" class="digit" data-val="4">4</span>
+          </div>
+          <div class="digit-container">
+            <span id="exp-disp-min-ones" class="digit" data-val="5">5</span>
+          </div>
+          <span
+            class="mx-3 pb-6 inline-block align-top font-bold text-slate-900"
+            >:</span
+          >
+          <div class="digit-container">
+            <span id="exp-disp-sec-tens" class="digit" data-val="0">0</span>
+          </div>
+          <div class="digit-container">
+            <span id="exp-disp-sec-ones" class="digit" data-val="0">0</span>
+          </div>
+        </div>
+        <p
+          class="text-3xl font-bold text-indigo-600 mt-8 uppercase tracking-[0.3em]"
+        >
+          Waktu Tersisa
+        </p>
+      </div>
+    </div>
+
     <script>
       const inputTimerName = document.getElementById("input-timer-name");
       const displayTimerName = document.getElementById("display-timer-name");
@@ -500,6 +658,13 @@
       const btnSoundDisable = document.getElementById("btn-sound-disable");
       const presets = document.querySelectorAll(".preset-pill");
 
+      const btnExpand = document.getElementById("btn-expand");
+      const btnCloseExpand = document.getElementById("btn-close-expand");
+      const fullscreenModal = document.getElementById("fullscreen-timer-modal");
+      const fsMin = document.getElementById("fs-min");
+      const fsSec = document.getElementById("fs-sec");
+      const fsTimerName = document.getElementById("fullscreen-timer-name");
+
       const customModal = document.getElementById("custom-modal");
       const customModalContent = document.getElementById(
         "custom-modal-content",
@@ -508,6 +673,17 @@
         "custom-modal-message",
       );
       const btnCloseModal = document.getElementById("btn-close-modal");
+
+      const btnExpandDisplay = document.getElementById("btn-expand-display");
+      const expandedDisplayModal = document.getElementById(
+        "expanded-display-modal",
+      );
+      const btnCloseExpanded = document.getElementById("btn-close-expanded");
+      const expDispMinTens = document.getElementById("exp-disp-min-tens");
+      const expDispMinOnes = document.getElementById("exp-disp-min-ones");
+      const expDispSecTens = document.getElementById("exp-disp-sec-tens");
+      const expDispSecOnes = document.getElementById("exp-disp-sec-ones");
+      const expandedTimerName = document.getElementById("expanded-timer-name");
 
       let timerInterval = null;
       let totalSeconds = 0;
@@ -540,22 +716,6 @@
           element.dataset.val = newValue;
           element.classList.add("roll-animation");
         }
-      };
-
-      const updateDisplay = () => {
-        const m = Math.floor(totalSeconds / 60);
-        const s = totalSeconds % 60;
-
-        const currentMinStr = formatTime(m);
-        const currentSecStr = formatTime(s);
-
-        const titlePrefix = currentTimerName ? `${currentTimerName} - ` : "";
-        document.title = `(${currentMinStr}:${currentSecStr}) ${titlePrefix}Timer`;
-
-        updateDigit(dispMinTens, currentMinStr[0]);
-        updateDigit(dispMinOnes, currentMinStr[1]);
-        updateDigit(dispSecTens, currentSecStr[0]);
-        updateDigit(dispSecOnes, currentSecStr[1]);
       };
 
       const showCustomAlert = (taskName) => {
@@ -717,6 +877,44 @@
       btnReset.addEventListener("click", resetTimer);
       presets.forEach((p) => p.addEventListener("click", handlePresetClick));
 
+      // Logika membuka modal
+      btnExpand.addEventListener("click", () => {
+        fsTimerName.textContent = currentTimerName;
+        fullscreenModal.classList.remove("opacity-0", "pointer-events-none");
+      });
+
+      // Logika menutup modal
+      btnCloseExpand.addEventListener("click", () => {
+        fullscreenModal.classList.add("opacity-0", "pointer-events-none");
+      });
+
+      // Update tampilan fullscreen di dalam fungsi updateDisplay
+      const updateDisplay = () => {
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+        const currentMinStr = formatTime(m);
+        const currentSecStr = formatTime(s);
+
+        // Update main display
+        updateDigit(dispMinTens, currentMinStr[0]);
+        updateDigit(dispMinOnes, currentMinStr[1]);
+        updateDigit(dispSecTens, currentSecStr[0]);
+        updateDigit(dispSecOnes, currentSecStr[1]);
+
+        // Update Fullscreen display
+        fsMin.textContent = currentMinStr;
+        fsSec.textContent = currentSecStr;
+
+        // Update Expanded display
+        updateDigit(expDispMinTens, currentMinStr[0]);
+        updateDigit(expDispMinOnes, currentMinStr[1]);
+        updateDigit(expDispSecTens, currentSecStr[0]);
+        updateDigit(expDispSecOnes, currentSecStr[1]);
+
+        const titlePrefix = currentTimerName ? `${currentTimerName} - ` : "";
+        document.title = `(${currentMinStr}:${currentSecStr}) ${titlePrefix}Timer`;
+      };
+
       // --- PERBAIKAN LOGIKA TOMBOL SUARA ---
       const updateSoundUI = () => {
         if (soundEnabled) {
@@ -785,6 +983,29 @@
       });
 
       updateSoundUI();
+
+      // Event listeners untuk expanded display modal
+      btnExpandDisplay.addEventListener("click", () => {
+        expandedTimerName.textContent = currentTimerName;
+        expandedDisplayModal.classList.remove(
+          "opacity-0",
+          "pointer-events-none",
+        );
+      });
+
+      btnCloseExpanded.addEventListener("click", () => {
+        expandedDisplayModal.classList.add("opacity-0", "pointer-events-none");
+      });
+
+      // Close modal ketika click di background
+      expandedDisplayModal.addEventListener("click", (e) => {
+        if (e.target === expandedDisplayModal) {
+          expandedDisplayModal.classList.add(
+            "opacity-0",
+            "pointer-events-none",
+          );
+        }
+      });
     </script>
   </body>
 </html>

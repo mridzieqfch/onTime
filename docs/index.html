@@ -519,6 +519,7 @@
       inputSec.value = "0";
 
       const alarmSound = new Audio("assets/krl.mp3");
+      const warning10MinSound = new Audio("assets/10Menit.mp3");
       const warning5MinSound = new Audio("assets/5Menit.mp3");
       const warning3MinSound = new Audio("assets/3Menit.mp3");
       const warning1MinSound = new Audio("assets/1Menit.mp3");
@@ -639,7 +640,10 @@
           totalSeconds--;
           updateDisplay();
 
-          if (totalSeconds === 300) {
+          if (totalSeconds === 600) {
+            if (soundEnabled)
+              warning10MinSound.play().catch((e) => console.log(e));
+          } else if (totalSeconds === 300) {
             if (soundEnabled)
               warning5MinSound.play().catch((e) => console.log(e));
           } else if (totalSeconds === 180) {

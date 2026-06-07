@@ -18,7 +18,6 @@
         -webkit-font-smoothing: antialiased;
       }
 
-      /* Font formal, tebal, dan tabular (jarak angka konsisten) */
       .font-timer {
         font-family: "Inter", sans-serif;
         font-weight: 800;
@@ -71,7 +70,6 @@
         animation: gentle-pulse 2.5s ease-in-out infinite;
       }
 
-      /* CSS UNTUK ANIMASI ROLL PER CHARACTER */
       .digit-container {
         display: inline-flex;
         justify-content: center;
@@ -102,7 +100,6 @@
         }
       }
 
-      /* Animasi getar untuk ikon lonceng di modal */
       @keyframes ring {
         0%,
         100% {
@@ -249,7 +246,7 @@
       <div
         class="bg-white p-8 md:p-10 rounded-[2rem] shadow-[0_4px_40px_rgb(0,0,0,0.03)] border border-slate-50 flex flex-col h-full"
       >
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
           <h2
             class="text-[1.35rem] font-bold text-slate-800 tracking-tight flex items-center gap-4"
           >
@@ -279,14 +276,58 @@
             </div>
             Layar Timer
           </h2>
-          <span
-            class="text-[0.7rem] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5"
-          >
-            Estimasi
-            <span id="total-time-readout" class="text-indigo-600 font-timer"
-              >45:00</span
+
+          <div class="flex items-center gap-3">
+            <button
+              id="btn-sound-enable"
+              class="px-4 py-2 bg-emerald-50 border border-emerald-300 text-emerald-700 text-[0.75rem] font-bold rounded-lg transition-all active:scale-95 flex items-center gap-1.5 hover:bg-emerald-100"
             >
-          </span>
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5.882V19.24a1.961 1.961 0 00-3.751-.258m15.584-11.36a3 3 0 11-6 0 3 3 0 016 0z"
+                ></path>
+              </svg>
+              Aktif
+            </button>
+            <button
+              id="btn-sound-disable"
+              class="px-4 py-2 bg-transparent opacity-50 border border-slate-200 text-slate-500 text-[0.75rem] font-bold rounded-lg transition-all active:scale-95 flex items-center gap-1.5 hover:bg-slate-50"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707a1 1 0 011.414 0l4.707 4.707V9a1 1 0 011 1v4a1 1 0 01-1 1h-1.586l4.707 4.707a1 1 0 01-1.414 1.414L13 16.586V17a1 1 0 01-1 1h-2a1 1 0 01-1-1v-.586L5.707 19.121A1 1 0 014.293 17.707L5.586 15z"
+                ></path>
+              </svg>
+              Mati
+            </button>
+
+            <span
+              class="text-[0.7rem] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg flex items-center gap-1.5 ml-2"
+            >
+              Estimasi
+              <span id="total-time-readout" class="text-indigo-600 font-timer"
+                >45:00</span
+              >
+            </span>
+          </div>
         </div>
 
         <div class="flex-grow flex flex-col justify-center mb-8 relative">
@@ -320,7 +361,7 @@
 
           <div id="timer-display-area" class="hidden h-full">
             <div
-              class="bg-gradient-to-br from-[#48A111] to-[#48A111] border border-blue-100 rounded-[1.8rem] flex flex-col items-center justify-center transition-all py-10 px-6 shadow-inner w-full h-full relative overflow-hidden"
+              class="bg-gradient-to-br from-[#eff6ff] to-[#eef2ff] border border-blue-100 rounded-[1.8rem] flex flex-col items-center justify-center transition-all py-10 px-6 shadow-inner w-full h-full relative overflow-hidden"
             >
               <h3
                 id="display-timer-name"
@@ -455,9 +496,10 @@
       const runningControls = document.getElementById("running-controls");
       const btnPause = document.getElementById("btn-pause");
       const btnReset = document.getElementById("btn-reset");
+      const btnSoundEnable = document.getElementById("btn-sound-enable");
+      const btnSoundDisable = document.getElementById("btn-sound-disable");
       const presets = document.querySelectorAll(".preset-pill");
 
-      // Variabel untuk Custom Modal
       const customModal = document.getElementById("custom-modal");
       const customModalContent = document.getElementById(
         "custom-modal-content",
@@ -471,6 +513,7 @@
       let totalSeconds = 0;
       let isPaused = false;
       let currentTimerName = "Timer Name";
+      let soundEnabled = true;
 
       inputMin.value = "0";
       inputSec.value = "0";
@@ -514,30 +557,21 @@
         updateDigit(dispSecOnes, currentSecStr[1]);
       };
 
-      // --- LOGIKA MENAMPILKAN & MENYEMBUNYIKAN MODAL ---
       const showCustomAlert = (taskName) => {
-        // Update teks
         customModalMessage.innerHTML = `Waktu untuk kegiatan <strong class="text-slate-800 text-base">"${taskName}"</strong> telah selesai.`;
-
-        // Tampilkan Modal
         customModal.classList.remove("opacity-0", "pointer-events-none");
         customModalContent.classList.remove("scale-95", "translate-y-4");
         customModalContent.classList.add("scale-100", "translate-y-0");
       };
 
       const hideCustomAlert = () => {
-        // Sembunyikan Modal
         customModal.classList.add("opacity-0", "pointer-events-none");
         customModalContent.classList.remove("scale-100", "translate-y-0");
         customModalContent.classList.add("scale-95", "translate-y-4");
-
-        // Panggil fungsi reset setelah modal ditutup
         resetTimer();
       };
 
-      // Event Listener Tombol Tutup Modal
       btnCloseModal.addEventListener("click", hideCustomAlert);
-      // ------------------------------------------------
 
       const toggleUI = (isPlaying) => {
         if (isPlaying) {
@@ -606,30 +640,25 @@
           updateDisplay();
 
           if (totalSeconds === 300) {
-            warning5MinSound
-              .play()
-              .catch((e) => console.log("Audio blocked", e));
+            if (soundEnabled)
+              warning5MinSound.play().catch((e) => console.log(e));
           } else if (totalSeconds === 180) {
-            warning3MinSound
-              .play()
-              .catch((e) => console.log("Audio blocked", e));
+            if (soundEnabled)
+              warning3MinSound.play().catch((e) => console.log(e));
           } else if (totalSeconds === 60) {
-            warning1MinSound
-              .play()
-              .catch((e) => console.log("Audio blocked", e));
+            if (soundEnabled)
+              warning1MinSound.play().catch((e) => console.log(e));
           }
 
-          // Trigger Selesai (Menggunakan totalSeconds <= 3 sesuai kode Anda sebelumnya)
           if (totalSeconds <= 3) {
             clearInterval(timerInterval);
-            alarmSound.play().catch((e) => console.log("Audio blocked", e));
+            if (soundEnabled) alarmSound.play().catch((e) => console.log(e));
 
             dispMinTens.parentElement.parentElement.classList.add(
               "text-red-500",
             );
             document.title = "Waktu Habis!";
 
-            // PANGGIL CUSTOM MODAL DI SINI (Menggantikan alert bawaan)
             setTimeout(() => {
               showCustomAlert(currentTimerName);
             }, 500);
@@ -683,6 +712,75 @@
       btnPause.addEventListener("click", pauseTimer);
       btnReset.addEventListener("click", resetTimer);
       presets.forEach((p) => p.addEventListener("click", handlePresetClick));
+
+      // --- PERBAIKAN LOGIKA TOMBOL SUARA ---
+      const updateSoundUI = () => {
+        if (soundEnabled) {
+          // Tombol Aktif Menyala
+          btnSoundEnable.classList.remove(
+            "opacity-50",
+            "bg-transparent",
+            "text-slate-500",
+            "border-slate-200",
+          );
+          btnSoundEnable.classList.add(
+            "bg-emerald-50",
+            "text-emerald-700",
+            "border-emerald-300",
+          );
+
+          // Tombol Mati Meredup tapi TETAP BISA DIKLIK
+          btnSoundDisable.classList.remove(
+            "bg-red-50",
+            "text-red-600",
+            "border-red-200",
+          );
+          btnSoundDisable.classList.add(
+            "opacity-50",
+            "bg-transparent",
+            "text-slate-500",
+            "border-slate-200",
+          );
+        } else {
+          // Tombol Aktif Meredup tapi TETAP BISA DIKLIK
+          btnSoundEnable.classList.remove(
+            "bg-emerald-50",
+            "text-emerald-700",
+            "border-emerald-300",
+          );
+          btnSoundEnable.classList.add(
+            "opacity-50",
+            "bg-transparent",
+            "text-slate-500",
+            "border-slate-200",
+          );
+
+          // Tombol Mati Menyala
+          btnSoundDisable.classList.remove(
+            "opacity-50",
+            "bg-transparent",
+            "text-slate-500",
+            "border-slate-200",
+          );
+          btnSoundDisable.classList.add(
+            "bg-red-50",
+            "text-red-600",
+            "border-red-200",
+          );
+        }
+      };
+
+      btnSoundEnable.addEventListener("click", () => {
+        soundEnabled = true;
+        updateSoundUI();
+      });
+
+      btnSoundDisable.addEventListener("click", () => {
+        soundEnabled = false;
+        updateSoundUI();
+      });
+
+      updateSoundUI();
     </script>
   </body>
 </html>

@@ -536,7 +536,7 @@
     >
       <div
         id="exp-bg-layer"
-        class="absolute inset-0 bg-gradient-to-br from-[#48A111] to-[#38800d] backdrop-blur-sm transition-all duration-500"
+        class="absolute inset-0 bg-gradient-to-br from-sky-200 to-sky-300 backdrop-blur-sm transition-all duration-500"
       ></div>
 
       <button
@@ -564,12 +564,12 @@
       >
         <h3
           id="expanded-timer-name"
-          class="text-3xl font-bold text-white/90 mb-8 tracking-widest uppercase drop-shadow-md"
+          class="text-3xl font-bold text-slate-600 mb-8 tracking-widest uppercase drop-shadow-md drop-shadow-[0_8px_24px_rgba(0,0,0,1)]"
         >
           Timer
         </h3>
         <div
-          class="font-timer text-[20rem] leading-none tracking-tighter text-white flex items-center justify-center drop-shadow-2xl"
+          class="font-timer text-[18rem] leading-none tracking-tighter text-slate-700 flex items-center justify-center drop-shadow-[0_8px_24px_rgba(0,0,0,0.40)]"
         >
           <div class="digit-container">
             <span id="exp-disp-min-tens" class="digit" data-val="4">4</span>
@@ -577,7 +577,8 @@
           <div class="digit-container">
             <span id="exp-disp-min-ones" class="digit" data-val="5">5</span>
           </div>
-          <span class="mx-3 pb-6 inline-block align-top font-bold text-white/80"
+          <span
+            class="mx-3 pb-6 inline-block align-top font-bold text-slate-800"
             >:</span
           >
           <div class="digit-container">
@@ -588,10 +589,33 @@
           </div>
         </div>
         <p
-          class="text-3xl font-bold text-white/80 mt-8 uppercase tracking-[0.3em]"
+          class="text-3xl font-bold text-slate-800 mt-8 uppercase tracking-[0.3em]"
         >
           Waktu Tersisa
         </p>
+
+        <div class="mt-12 flex items-center gap-4">
+          <button
+            id="btn-exp-pause"
+            class="px-8 py-4 text-slate-800 hover:bg-white/20 border border-white/20 backdrop-blur-md text-white text-xl font-bold rounded-2xl transition-all shadow-lg active:scale-[0.98] flex items-center gap-3"
+          >
+            <svg
+              id="icon-exp-pause"
+              class="w-7 h-7"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+            <span id="text-exp-pause">Pause</span>
+          </button>
+        </div>
       </div>
 
       <div
@@ -646,8 +670,8 @@
       );
       const btnCloseExpanded = document.getElementById("btn-close-expanded");
       const expandedTimerName = document.getElementById("expanded-timer-name");
-      const expBgLayer = document.getElementById("exp-bg-layer"); // Latar Fullscreen
-      const colorBtns = document.querySelectorAll(".color-btn"); // Tombol Pemilih Warna
+      const expBgLayer = document.getElementById("exp-bg-layer");
+      const colorBtns = document.querySelectorAll(".color-btn");
 
       const expDispMinTens = document.getElementById("exp-disp-min-tens");
       const expDispMinOnes = document.getElementById("exp-disp-min-ones");
@@ -659,6 +683,11 @@
       const expFinishedMessage = document.getElementById(
         "exp-finished-message",
       );
+
+      // Deklarasi tombol baru pada fullscreen
+      const btnExpPause = document.getElementById("btn-exp-pause");
+      const textExpPause = document.getElementById("text-exp-pause");
+      const iconExpPause = document.getElementById("icon-exp-pause");
 
       let timerInterval = null;
       let totalSeconds = 0;
@@ -672,7 +701,6 @@
       const alarmSound = new Audio("assets/krl.mp3");
       const warning10MinSound = new Audio("assets/10Menit.mp3");
       const warning5MinSound = new Audio("assets/5Menit.mp3");
-      // const warning3MinSound = new Audio("assets/3Menit.mp3");
       const warning1MinSound = new Audio("assets/1Menit.mp3");
 
       const formatTime = (time) => time.toString().padStart(2, "0");
@@ -805,7 +833,13 @@
         isPaused = false;
         toggleUI(true);
         updateDisplay();
+
+        // Sinkronisasi tombol utama dan expanded ke state "Pause"
         btnPause.textContent = "Pause";
+        if (textExpPause) textExpPause.textContent = "Pause";
+        if (iconExpPause)
+          iconExpPause.innerHTML =
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
 
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
@@ -819,7 +853,7 @@
             if (soundEnabled)
               warning5MinSound.play().catch((e) => console.log(e));
           } else if (totalSeconds === 180) {
-            if (soundEnabled)
+            if (soundEnabled && typeof warning3MinSound !== "undefined")
               warning3MinSound.play().catch((e) => console.log(e));
           } else if (totalSeconds === 60) {
             if (soundEnabled)
@@ -838,11 +872,17 @@
 
       const pauseTimer = () => {
         if (isPaused) {
-          startTimer();
+          startTimer(); // Lanjut (Start)
         } else {
           clearInterval(timerInterval);
           isPaused = true;
+
+          // Sinkronisasi tombol utama dan expanded ke state "Lanjut (Play)"
           btnPause.textContent = "Lanjut";
+          if (textExpPause) textExpPause.textContent = "Lanjut";
+          if (iconExpPause)
+            iconExpPause.innerHTML =
+              '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
         }
       };
 
@@ -880,6 +920,11 @@
       btnPause.addEventListener("click", pauseTimer);
       btnReset.addEventListener("click", resetTimer);
       presets.forEach((p) => p.addEventListener("click", handlePresetClick));
+
+      // Event listener untuk tombol di dalam modal fullscreen
+      if (btnExpPause) {
+        btnExpPause.addEventListener("click", pauseTimer);
+      }
 
       // --- LOGIKA TOMBOL SUARA ---
       const updateSoundUI = () => {
@@ -941,20 +986,17 @@
       });
       updateSoundUI();
 
-      // --- LOGIKA PILIHAN WARNA (BARU) ---
+      // --- LOGIKA PILIHAN WARNA ---
       colorBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
-          // Reset ring (outline) aktif dari semua tombol warna
           colorBtns.forEach((b) => {
             b.classList.remove("ring-2");
             b.classList.add("ring-0");
           });
 
-          // Tambahkan ring aktif ke tombol yang diklik
           btn.classList.remove("ring-0");
           btn.classList.add("ring-2");
 
-          // Ambil value class gradasi dari data-bg dan terapkan ke layer background
           const newBg = btn.getAttribute("data-bg");
           expBgLayer.className = `absolute inset-0 bg-gradient-to-br ${newBg} backdrop-blur-sm transition-all duration-500`;
         });
@@ -973,7 +1015,6 @@
         expandedDisplayModal.classList.add("opacity-0", "pointer-events-none");
       });
 
-      // Menutup fullscreen jika menekan layar kosong
       expandedDisplayModal.addEventListener("click", (e) => {
         if (e.target === expandedDisplayModal || e.target === expBgLayer) {
           expandedDisplayModal.classList.add(
